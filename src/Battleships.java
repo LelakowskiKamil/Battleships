@@ -1,23 +1,26 @@
 import java.sql.SQLOutput;
+import java.util.HashSet;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.Set;
 
 public class Battleships {
     public static void main(String[] args) {
         Board myBoard = new Board("X");
         Board computerBoard = new Board("@");
         Board emptyBoard = new Board();
-      //  generateEmptyBoard(myBoard.board);
-      //  printBoard(myBoard.board);
-     //   myBoard.board=setShip(myBoard.board,myBoard.marker);
-        generateEmptyBoard(computerBoard.board);
-        computerBoard.board=computerSetShip(computerBoard.board, computerBoard.marker);
-        printBoard(computerBoard.board);
-        shot(computerBoard,emptyBoard);
-       // computerBoard.board=computerSetShip(computerBoard.board, computerBoard.marker);
-//printBoard(computerBoard.board);
 
-    }
+        game(computerBoard,emptyBoard,myBoard);
+
+   }
+   public static void game(Board computerBoard,Board emptyBoard,Board myBoard){
+       generateEmptyBoard(myBoard.board);
+       printBoard(myBoard.board);
+       myBoard.board=setShip(myBoard.board,myBoard.marker);
+       generateEmptyBoard(computerBoard.board);
+       computerBoard.board=computerSetShip(computerBoard.board, computerBoard.marker);
+       turn(computerBoard,myBoard,emptyBoard);
+   }
     static void printBoard(String[][] board){
         for (int i = 0; i < 12; i++) {
             for (int j = 0; j < 12; j++) {
@@ -525,17 +528,17 @@ shipSize++;
             generateEmptyBoard(board);
             computerSetShip(board,marker);
         }
-// printBoard(board);
         return board;
 }
 
     public static void shot(Board computerBoard,Board emptyBoard){
-        generateEmptyBoard(emptyBoard.board);
         do{
+            System.out.println("Enter the row index:");
             int row = new Scanner(System.in).nextInt();
             System.out.println("Enter the column index:");
             int col = new Scanner(System.in).nextInt();
-            String kord = ""+row+col;
+            String kord1 = Integer.toString(row)+Integer.toString(col);
+            int kord= Integer.parseInt(kord1);
             try {
                 if (row==0 || col==0 || col==11 || row==11){
                     System.out.println("Out of board, try again");
@@ -547,8 +550,8 @@ shipSize++;
                     computerBoard.hitPoints.add(kord);
                     computerBoard.numberOfHit++;
                     System.out.println("Getting hit!");
-                    computerBoard.board[row][col]=computerBoard.successfullShot;
-                    printBoard(computerBoard.board);
+                    emptyBoard.board[row][col]=computerBoard.successfullShot;
+                    printBoard(emptyBoard.board);
 
                     if(computerBoard.numberOfHit==34){
                         System.out.println("you won");
@@ -558,20 +561,71 @@ shipSize++;
 
                 }else if(computerBoard.board[row][col].equals(computerBoard.missedShot)) {
                     System.out.println("you already hit this field");
-                    computerBoard.isHit=true;}
+                    computerBoard.isHit=true;
+                continue;}
                 else if(computerBoard.board[row][col].equals(computerBoard.successfullShot)) {
                     System.out.println("you already hit this field");
-                    computerBoard.isHit=true;}
+                    computerBoard.isHit=true;
+                    continue;}
                 else{
                     System.out.println("mishit!");
-                    computerBoard.board[row][col]=computerBoard.missedShot;
-                    printBoard(computerBoard.board);
+                    emptyBoard.board[row][col]=computerBoard.missedShot;
+                    printBoard(emptyBoard.board);
                     computerBoard.isHit=false;}
             }catch (ArrayIndexOutOfBoundsException e) {
                 System.out.println("Out of range");
             }
-        }while(computerBoard.isHit=true);
+        }while(computerBoard.isHit);
+}
+
+    public static void computerShot(Board myBoard){
+        Random random = new Random();
+        do{
+            int row = random.nextInt(10)+1;
+            int col = random.nextInt(10)+1;
+            String kord1 = ""+row+col;
+            int kord= Integer.parseInt(kord1);
+            try {
+                System.out.println("Computer shot: "+row +" "+col);
+                if (myBoard.hitPoints.contains(kord)){
+                    myBoard.isHit=true;
+                    continue;
+                }
+                myBoard.hitPoints.add(kord);
+                if(myBoard.board[row][col].equals(myBoard.marker)) {
+                    myBoard.isHit=true;
+                    myBoard.hitPoints.add(kord);
+                    myBoard.numberOfHit++;
+                    System.out.println("Trafiony");
+                    myBoard.board[row][col]=myBoard.successfullShot;
+                    printBoard(myBoard.board);
+
+                    if(myBoard.numberOfHit==34){
+                        System.out.println("Enemy correct hits: "+myBoard.numberOfHit);
+                        System.out.println("you lose");
+                        break;
+
+                    }
+                    System.out.println("the number of shot: "+myBoard.numberOfHit);
+
+                }else{
+                    System.out.println("mishit!");
+                    myBoard.board[row][col]=myBoard.missedShot;
+                    printBoard(myBoard.board);
+                    myBoard.isHit=false;}
+            }catch (ArrayIndexOutOfBoundsException e) {
+            }
+        }while(myBoard.isHit);
+}
+    public static void turn(Board computerBoard, Board myBoard, Board emptyBoard){
+    generateEmptyBoard(emptyBoard.board);
+        while (computerBoard.numberOfHit<34 || myBoard.numberOfHit<34) {
+            shot(computerBoard, emptyBoard);
+            computerShot(myBoard);
+        }
+
 }
     }
+
 
 
