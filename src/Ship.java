@@ -7,7 +7,7 @@ public class Ship {
     public Ship(int shipSize) {
         this.shipSize = shipSize;
         if (shipSize==2){
-            numberOfShipToBeStacked=3;
+            numberOfShipToBeStacked=4;
         }else if (shipSize==3){
             numberOfShipToBeStacked=3;
         }else if (shipSize==4){

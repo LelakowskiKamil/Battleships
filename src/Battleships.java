@@ -6,11 +6,14 @@ public class Battleships {
     public static void main(String[] args) {
         Board myBoard = new Board("X");
         Board computerBoard = new Board("@");
-       // generateEmptyBoard(myBoard.board);
-       // printBoard(myBoard.board);
-       // setShip(myBoard.board,myBoard.marker);
+        Board emptyBoard = new Board();
+      //  generateEmptyBoard(myBoard.board);
+      //  printBoard(myBoard.board);
+     //   myBoard.board=setShip(myBoard.board,myBoard.marker);
         generateEmptyBoard(computerBoard.board);
-        computerSetShip(computerBoard.board, computerBoard.marker);
+        computerBoard.board=computerSetShip(computerBoard.board, computerBoard.marker);
+        printBoard(computerBoard.board);
+        shot(computerBoard,emptyBoard);
        // computerBoard.board=computerSetShip(computerBoard.board, computerBoard.marker);
 //printBoard(computerBoard.board);
 
@@ -46,10 +49,9 @@ public class Battleships {
         }
         return board;
     }
-    public static void setShip(String[][] board, String marker) {
+    public static String[][] setShip(String[][] board, String marker) {
         int shipSize=2;
         while(shipSize<6){
-       // System.out.println("Set up a ship with 2 spaces");
         Ship ship = new Ship(shipSize);
         while (ship.numberOfShipToBeStacked > 0) {
             System.out.println(ship.getVoice(shipSize));
@@ -216,6 +218,7 @@ public class Battleships {
 shipSize++;
 
     }
+        return board;
     }
     public static String[][] computerSetShip(String[][] board, String marker){
         int count=0;
@@ -227,13 +230,11 @@ shipSize++;
             while (ship.numberOfShipToBeStacked > 0) {
             try {
                 count++;
-                System.out.println("counter = "+count);
-                System.out.println("rozmiar kolcka: "+shipSize+" zostalo: "+ship.numberOfShipToBeStacked);
                 int row = random.nextInt(11) + 1;
                 int col = random.nextInt(11) + 1;
 
                 if(shipSize==5){
-                    if (count==35){
+                    if (count==100){
                         break;
                     }
                     if(col<2 || col>7){
@@ -271,8 +272,8 @@ shipSize++;
                                 board[row][col + 1] = marker;
                                 board[row][col + 2] = marker;
                                 board[row][col + 3] = marker;
-                                ship.numberOfShipToBeStacked--;
                                 count=0;
+                                ship.numberOfShipToBeStacked--;
                             }
                         }
                     }
@@ -314,8 +315,8 @@ shipSize++;
                                     board[row+1][col] = marker;
                                     board[row][col] = marker;
                                     board[row-1][col] = marker;
-                                    ship.numberOfShipToBeStacked--;
                                     count=0;
+                                    ship.numberOfShipToBeStacked--;
                                     if (ship.numberOfShipToBeStacked==0){
                                         continue;}
                                 }
@@ -398,8 +399,8 @@ shipSize++;
                                     board[row+1][col] = marker;
                                     board[row][col] = marker;
                                     board[row-1][col] = marker;
-                                    ship.numberOfShipToBeStacked--;
                                     count=0;
+                                    ship.numberOfShipToBeStacked--;
                                     if (ship.numberOfShipToBeStacked==0){
                                         continue;}
                                 }
@@ -512,7 +513,6 @@ shipSize++;
 }
 
             } catch (ArrayIndexOutOfBoundsException e) {
-                System.out.println(e.toString());
             }
 
     }
@@ -520,13 +520,58 @@ shipSize++;
                 break;
             }
             shipSize--;
-            printBoard(board);
 }
         if (count==100){
             generateEmptyBoard(board);
             computerSetShip(board,marker);
         }
+// printBoard(board);
         return board;
 }
+
+    public static void shot(Board computerBoard,Board emptyBoard){
+        generateEmptyBoard(emptyBoard.board);
+        do{
+            int row = new Scanner(System.in).nextInt();
+            System.out.println("Enter the column index:");
+            int col = new Scanner(System.in).nextInt();
+            String kord = ""+row+col;
+            try {
+                if (row==0 || col==0 || col==11 || row==11){
+                    System.out.println("Out of board, try again");
+                    computerBoard.isHit=true;
+                    continue;
+                }
+                if(computerBoard.board[row][col].equals(computerBoard.marker)) {
+                    computerBoard.isHit=true;
+                    computerBoard.hitPoints.add(kord);
+                    computerBoard.numberOfHit++;
+                    System.out.println("Getting hit!");
+                    computerBoard.board[row][col]=computerBoard.successfullShot;
+                    printBoard(computerBoard.board);
+
+                    if(computerBoard.numberOfHit==34){
+                        System.out.println("you won");
+                        break;
+                    }
+                    System.out.println("the number of shot: "+computerBoard.numberOfHit);
+
+                }else if(computerBoard.board[row][col].equals(computerBoard.missedShot)) {
+                    System.out.println("you already hit this field");
+                    computerBoard.isHit=true;}
+                else if(computerBoard.board[row][col].equals(computerBoard.successfullShot)) {
+                    System.out.println("you already hit this field");
+                    computerBoard.isHit=true;}
+                else{
+                    System.out.println("mishit!");
+                    computerBoard.board[row][col]=computerBoard.missedShot;
+                    printBoard(computerBoard.board);
+                    computerBoard.isHit=false;}
+            }catch (ArrayIndexOutOfBoundsException e) {
+                System.out.println("Out of range");
+            }
+        }while(computerBoard.isHit=true);
 }
+    }
+
 
